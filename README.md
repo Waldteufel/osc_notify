@@ -1,4 +1,4 @@
-osc_notify
+OSC Notify
 ==========
 
-use urxvt's OSC 777 code to get desktop notifications from weechat
+Install the two URxvt plugins and the weechat plugin and have desktop-notifications from weechat even over SSH and from inside TMUX.
