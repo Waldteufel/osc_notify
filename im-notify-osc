@@ -5,8 +5,8 @@ sub on_osc_seq_perl {
 	return unless $args =~ s/^im-notify;//;
 	my ($visible, $tmux_visible, $text) = split(';', $args);
 
-	$self->exec_async("canberra-gtk-play", "--id=message-new-instant") unless $self->focus and $visible and $tmux_visible;
-	$self->exec_async("notify-send", "[IM] $text") unless $self->focus and $tmux_visible;
+	$self->exec_async('canberra-gtk-play', '--id=message-new-instant') unless $self->focus and $visible and $tmux_visible;
+	$self->exec_async('notify-send', "[IM] $text") unless $self->focus and $tmux_visible;
 
 	()
 }
