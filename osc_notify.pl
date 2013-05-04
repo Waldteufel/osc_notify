@@ -26,14 +26,14 @@ sub osc {
 
 sub notify {
 	my (undef, $buffer, $date, $tags, $displayed, $highlight, $prefix, $message) = @_;
+	return unless $displayed;
+
 	my %tags = map { $_ => 1 } split(',', $tags);
 
 	if ($highlight || $tags{'notify_private'}) {
 		print STDERR "\a";
-		if (weechat::window_search_with_buffer($buffer) ne weechat::current_window()) {
-			osc 'play', 'message-new-instant';
-			osc 'show', "[IM] $prefix";
-		}
+		my $visible = weechat::window_search_with_buffer($buffer) eq weechat::current_window();
+		osc 'im-notify', $visible, $prefix;
 	}
 
 	return weechat::WEECHAT_RC_OK;
