@@ -18,10 +18,26 @@ use strict;
 weechat::register('osc_notify', 'Benjamin Richter <br@waldteufel.eu>', '0.1', 'GPL3', 'use custom OSC codes to show remote notifications and play sounds', '', '');
 weechat::hook_print('', 'irc_privmsg', '', 1, 'notify', '');
 
+sub tmux_visible {
+	return 1 unless defined $ENV{TMUX};
+	return `tmux display-message -p \#{pane_id}` eq $ENV{TMUX_PANE};
+}
+
 sub osc {
-	print STDERR "\ePtmux;\e" if defined $ENV{TMUX};
-	print STDERR "\e]777;".join(';',@_)."\a";
-	print STDERR "\e\\" if defined $ENV{TMUX};
+	my $msg = "\e]777;".join(';',@_)."\a";
+
+	if (defined $ENV{TMUX}) {
+		open my $clients, '-|', 'tmux list-clients -F \#{client_tty}';
+		foreach (<$clients>) {
+			chomp;
+			open my $fd, '>', $_;
+			print $fd $msg;
+			close $fd;
+		}
+		close $clients;
+	} else {
+		print STDERR $msg;
+	}
 }
 
 sub notify {
@@ -33,7 +49,7 @@ sub notify {
 	if ($highlight || $tags{'notify_private'}) {
 		print STDERR "\a";
 		my $visible = weechat::window_search_with_buffer($buffer) eq weechat::current_window();
-		osc 'im-notify', $visible, $prefix;
+		osc 'im-notify', $visible, tmux_visible, $prefix;
 	}
 
 	return weechat::WEECHAT_RC_OK;
