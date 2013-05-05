@@ -20,14 +20,14 @@ weechat::hook_print('', 'irc_privmsg', '', 1, 'notify', '');
 
 sub tmux_visible {
 	return 1 unless defined $ENV{TMUX};
-	return `tmux display-message -p \#{pane_id}` eq $ENV{TMUX_PANE};
+	return int(`tmux display-message -p "#{pane_id}"` eq $ENV{TMUX_PANE}."\n");
 }
 
 sub osc {
 	my $msg = "\e]777;".join(';',@_)."\a";
 
 	if (defined $ENV{TMUX}) {
-		open my $clients, '-|', 'tmux list-clients -F \#{client_tty}';
+		open my $clients, '-|', 'tmux list-clients -F "#{client_tty}"';
 		foreach (<$clients>) {
 			chomp;
 			open my $fd, '>', $_;
@@ -48,7 +48,7 @@ sub notify {
 
 	if ($highlight || $tags{'notify_private'}) {
 		print STDERR "\a";
-		my $visible = weechat::window_search_with_buffer($buffer) eq weechat::current_window();
+		my $visible = int(weechat::window_search_with_buffer($buffer) eq weechat::current_window());
 		osc 'im-notify', $visible, tmux_visible, $prefix;
 	}
 
