@@ -11,7 +11,7 @@ sub on_osc_seq_perl {
 	$last_notified{$text} = time;
 
 	$self->exec_async('canberra-gtk-play', '--id=message-new-instant') unless $self->focus and $visible and $tmux_visible;
-	$self->exec_async('notify-send', '--expire-time=1000', 'Message from', $text) unless $self->focus and $tmux_visible;
+	$self->exec_async('notify-send', '--icon=user-available', '--expire-time=1000', 'Message from', $text) unless $self->focus and $tmux_visible;
 
 	()
 }
